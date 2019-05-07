@@ -1,0 +1,27 @@
+
+6.
+
+•Interfață GUI
+•5 interfețe POO.
+•10 clase.
+•1 clasă singleton.
+•3 clase care să aplice principiile moștenirii.
+•Ierarhie proprie de pachete (min. 5 pachete).
+•1 clasă abstractă.
+•Pentru fiecare clasă: 2 constructori, metode get/set, met. toString().
+•Utilizarea tablourilor și a listelor înlănțuite (implementare proprie).
+•Diagrama de clase pentru toată aplicația.
+
+
+10.
+
+•Pentru cel puțin o clasă (cu cel puțin 3 câmpuri): implementarea interfeței Comparable, suprascrierea metodei “equals”.
+
+•Polimorfism.
+•Expresii regulate.
+
+•Clase imbricate.
+•Ierarhie de excepții proprii (min. 5 excepții proprii).
+
+•Cel puțin două fire de execuție.
+•Comunicarea între fire de execuție prin mesaje proprii.
