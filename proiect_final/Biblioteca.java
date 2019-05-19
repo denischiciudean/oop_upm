@@ -83,16 +83,27 @@ public class Biblioteca extends ShelfMover {
 
     private Vector<Floor> floors;
 
-    public String getFloorNumber(Object floor) {
-        return ((Floor) floor).getCategory();
+    public Integer getFloorNumber(Object floor) {
+        return ((Floor) floor).getNumber();
     }
 
-    public Integer getFloorCategory(Object floor) {
-        return ((Floor) floor).getNumber();
+    public String getFloorCategory(Object floor) {
+        return categories.elementAt(((Floor) floor).getNumber());
     }
 
     public Object getIterator() {
         return floors.firstElement();
+    }
+
+    public Object getFloor(Integer floorNumber) {
+
+        for (Floor floor : floors) {
+            if (floor.getNumber() == floorNumber) {
+                return floor;
+            }
+        }
+
+        return null;
     }
 
     public Vector<Shelf> getFloorShelves(Object floor) {
