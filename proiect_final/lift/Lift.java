@@ -7,8 +7,6 @@ public class Lift {
     private Integer maxFloor;
 
     public Lift(Integer maxFloors) {
-
-
         maxFloors = maxFloor;
     }
 

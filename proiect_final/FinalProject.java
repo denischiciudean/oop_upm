@@ -28,6 +28,13 @@ class FinalProject {
     private JDialog operateLift = new JDialog();
     private JPanel currentFloorView;
 
+    private JFrame shelfFrame;
+
+    private JFrame bookFrame;
+
+    private Integer currentPageNumber;
+
+    private Page currentPage;
 
     FinalProject() {
         prepareGui();
@@ -60,6 +67,7 @@ class FinalProject {
 
         for (int i = 1; i < biblioteca.getNumber_of_floors(); i++) {
             floors[i] = biblioteca.getFloorNumber(biblioteca.getFloor(i));
+            Logger.LogStaticMessage("LIFT MOVING -- " + i);
         }
 
 
@@ -69,33 +77,7 @@ class FinalProject {
             if (userCurrentFloor == lift.currentFloor) {
 //                call_lift_button.setVisible(false);
 
-                Thread moveLift = new Thread(() -> {
-                    Object selected = JOptionPane.showInputDialog(operateLift, "Where to?", "Selection", JOptionPane.PLAIN_MESSAGE, null, floors, "0");
-                    if (selected != null) {
-                        Thread gotoFloor = new Thread(() -> {
-                            lift.goToFloor((Integer) selected);
-                        });
-                        Thread updateLabels = new Thread(() -> {
-                            while (gotoFloor.isAlive()) {
-                                liftCurrentFloorLabel.setText("Lift on floor : " + lift.currentFloor.toString());
-                                liftUserCurrentFloorLabel.setText("Your floor : " + lift.currentFloor.toString());
-                                userCurrentFloor = lift.currentFloor;
-                            }
-                            liftCurrentFloorLabel.setText("Lift on floor : " + lift.currentFloor.toString());
-                            liftUserCurrentFloorLabel.setText("Your floor : " + lift.currentFloor.toString());
-                            if ((Integer) selected != 0) {
-                                displayFloor();
-                            } else {
-                                currentFloorView = null;
-                                mainFrame.revalidate();
-                            }
-                        });
-                        gotoFloor.start();
-                        updateLabels.start();
-                    }
-                });
-
-                moveLift.start();
+                call_lift(floors);
 
             } else {
 
@@ -104,32 +86,7 @@ class FinalProject {
                     while (call.isAlive()) {
                         liftCurrentFloorLabel.setText("Lift on floor : " + lift.currentFloor.toString());
                     }
-                    Thread moveLift = new Thread(() -> {
-                        Object selected = JOptionPane.showInputDialog(operateLift, "Where to?", "Selection", JOptionPane.PLAIN_MESSAGE, null, floors, "0");
-                        if (selected != null) {
-                            Thread gotoFloor = new Thread(() -> {
-                                lift.goToFloor((Integer) selected);
-                            });
-                            Thread updateLabels = new Thread(() -> {
-                                while (gotoFloor.isAlive()) {
-                                    liftCurrentFloorLabel.setText("Lift on floor : " + lift.currentFloor.toString());
-                                    liftUserCurrentFloorLabel.setText("Your floor : " + lift.currentFloor.toString());
-                                    userCurrentFloor = lift.currentFloor;
-                                }
-                                liftCurrentFloorLabel.setText("Lift on floor : " + lift.currentFloor.toString());
-                                liftUserCurrentFloorLabel.setText("Your floor : " + lift.currentFloor.toString());
-                                if ((Integer) selected != 0) {
-                                    displayFloor();
-                                } else {
-                                    currentFloorView = null;
-                                    mainFrame.revalidate();
-                                }
-                            });
-                            gotoFloor.start();
-                            updateLabels.start();
-                        }
-                    });
-                    moveLift.start();
+                    call_lift(floors);
                 });
 
                 call.start();
@@ -151,6 +108,36 @@ class FinalProject {
 
         mainFrame.setLayout(new BorderLayout());
         mainFrame.setVisible(true);
+    }
+
+    private void call_lift(Integer[] floors) {
+        Thread moveLift = new Thread(() -> {
+            Object selected = JOptionPane.showInputDialog(operateLift, "Where to?", "Selection", JOptionPane.PLAIN_MESSAGE, null, floors, "0");
+            if (selected != null) {
+                Thread gotoFloor = new Thread(() -> {
+                    lift.goToFloor((Integer) selected);
+                });
+                Thread updateLabels = new Thread(() -> {
+                    while (gotoFloor.isAlive()) {
+                        liftCurrentFloorLabel.setText("Lift on floor : " + lift.currentFloor.toString());
+                        liftUserCurrentFloorLabel.setText("Your floor : " + lift.currentFloor.toString());
+                        userCurrentFloor = lift.currentFloor;
+                    }
+                    liftCurrentFloorLabel.setText("Lift on floor : " + lift.currentFloor.toString());
+                    liftUserCurrentFloorLabel.setText("Your floor : " + lift.currentFloor.toString());
+                    if ((Integer) selected != 0) {
+                        displayFloor();
+                    } else {
+                        currentFloorView = null;
+                        mainFrame.revalidate();
+                    }
+                });
+                gotoFloor.start();
+                updateLabels.start();
+            }
+        });
+
+        moveLift.start();
     }
 
     private void displayFloor() {
@@ -186,12 +173,85 @@ class FinalProject {
 
     private void displayBooks(Shelf shelf) {
 
-        for (Book book : shelf.getBooks()) {
-            System.out.println(book.name);
+        if (shelfFrame != null){
+            shelfFrame.setVisible(false);
         }
+
+        JFrame frame = new JFrame("Shelf no: " + shelf.index.toString());
+        frame.setSize(500,500);
+        frame.setLayout(new FlowLayout());
+
+        for (Book book : shelf.getBooks()) {
+            JButton book_btn = new JButton("<html> "+book.name+" <br> "+book.author+"</html>");
+            book_btn.setSize(50, 50);
+            book_btn.addActionListener(e -> readBook(book));
+            frame.add(book_btn);
+        }
+
+        shelfFrame = frame;
+        shelfFrame.setVisible(true);
 
     }
 
+    private void readBook(Book book){
+
+        if(bookFrame != null){
+            bookFrame.setVisible(false);
+        }
+
+        JFrame frame = new JFrame(book.name);
+        frame.setSize(500,500);
+        frame.setLayout(new CardLayout());
+
+        currentPage = book.pages.firstElement();
+        currentPageNumber = 0;
+
+        JPanel pane = new JPanel();
+        pane.setSize(250,250);
+        JTextArea content = new JTextArea(currentPage.getPage_content());
+        content.setEditable(false);
+
+        content.setLineWrap(true);
+        content.setPreferredSize(new Dimension(500,250));
+
+        JLabel pageNr = new JLabel(currentPage.getPageNumber().toString());
+
+
+        JButton next = new JButton("next page");
+        next.addActionListener(e -> {
+            if(currentPageNumber < 9){
+                this.currentPage = book.pages.elementAt(currentPageNumber+1);
+                this.currentPageNumber += 1;
+                content.setText(currentPage.getPage_content());
+                pageNr.setText(currentPage.getPageNumber().toString());
+                frame.revalidate();
+            }
+        });
+
+        JButton prev = new JButton("prev page");
+        prev.addActionListener(e -> {
+            if(currentPageNumber > 0){
+                this.currentPage = book.pages.elementAt(currentPageNumber-1);
+                this.currentPageNumber -= 1;
+                content.setText(currentPage.getPage_content());
+                pageNr.setText(currentPage.getPageNumber().toString());
+                frame.revalidate();
+            }
+        });
+
+        pane.add(content);
+
+        pane.add(prev);
+        pane.add(pageNr);
+
+        next.setSize(100,100);
+        pane.add(next);
+        frame.add(pane);
+
+        bookFrame = frame;
+        bookFrame.setVisible(true);
+
+    }
 
     public static void main(String args[]) {
 
@@ -200,24 +260,7 @@ class FinalProject {
         Logger logger = Logger.getInstance();
         logger.logMessage("Opened Library!");
 
-
-//        Object floor = main.biblioteca.getIterator();
-//        while (floor != null) {
-//            System.out.println("Floor number:" + main.biblioteca.getFloorCategory(floor));
-//            System.out.println("Floor Category:" + main.biblioteca.getFloorNumber(floor));
-//            for (Shelf shelf : main.biblioteca.getFloorShelves(floor)) {
-//
-//                System.out.println("--- Shelf index:" + shelf.index);
-//                for (Book book : shelf.getBooks()) {
-//                    System.out.println("------ Book name:" + book.name);
-//                    System.out.println("------ Book author:" + book.author);
-//                    System.out.println("------------------------------------");
-//                }
-//
-//            }
-//            System.out.println("-------------------------");
-//            floor = main.biblioteca.nextFloor(floor);
-//        }
+        Logger.LogStaticMessage("statically");
 
         logger.close();
     }

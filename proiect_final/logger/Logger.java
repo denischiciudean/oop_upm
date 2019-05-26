@@ -20,7 +20,7 @@ public class Logger {
 
     public void initalize() {
         try {
-            this.writer = new FileWriter("/tmp/java/log.txt");
+            this.writer = new FileWriter("./logs/log.txt");
         } catch (Exception e) {
             System.out.println("File not found!");
         }
@@ -35,6 +35,19 @@ public class Logger {
             System.out.println("Could not write to file");
         }
 
+    }
+
+    public static void LogStaticMessage(String _s){
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd H:mm:ss");
+        Date date = new Date();
+
+        Logger log = getInstance();
+
+        try {
+            log.writer.write("[" + dateFormat.format(date) + "] INFO: " + _s + "\n");
+        } catch (Exception e) {
+            System.out.println("Could not write to file");
+        }
     }
 
     public void close() {

@@ -1,6 +1,7 @@
 import java.util.Random;
 import java.util.Vector;
 
+import logger.Logger;
 import pages.*;
 
 class BookWriter extends Book {
@@ -16,8 +17,6 @@ class BookWriter extends Book {
     BookWriter(Integer _n) {
 
         defaultBookNumbers = _n;
-
-        //TODO:Implement File reading
 
         names.addElement("The 10X Rule");
         names.addElement("A Short Guide to a Happy Life");
@@ -53,6 +52,8 @@ class BookWriter extends Book {
 
             new_books.addElement(new_book);
 
+            Logger.LogStaticMessage("WRITING BOOK -- " + new_book.name + " |||  BY -- " + new_book.author);
+
         }
         return new_books;
     }
@@ -67,6 +68,9 @@ class BookWriter extends Book {
             new_page.setPageNumber(i);
             new_page.setPage_content(pagesContent.elementAt(random.nextInt(5)));
             pages.addElement(new_page);
+
+            Logger.LogStaticMessage("WRITING PAGE -- " + new_page.getPageNumber());
+
         }
 
         return pages;

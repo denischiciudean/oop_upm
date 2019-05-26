@@ -1,9 +1,11 @@
+import logger.Logger;
+
 import java.util.Vector;
 
 public class ShelfMover extends Shelf {
 
 
-    public static Integer defaultShelvesNumber = 5;
+    private static Integer defaultShelvesNumber = 5;
     private static Integer number_of_books_per_shelf = 5;
 
     ShelfMover(Integer _n, Integer books_per_shelf) {
@@ -21,6 +23,7 @@ public class ShelfMover extends Shelf {
             Shelf new_shelf = new Shelf(number_of_books_per_shelf);
             new_shelf.index = i;
             new_shelves.addElement(new_shelf);
+            Logger.LogStaticMessage("MOVING SHELF -- " + new_shelf.index);
 
         }
         return new_shelves;
